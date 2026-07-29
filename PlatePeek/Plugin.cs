@@ -19,6 +19,7 @@ public sealed class Plugin : IDalamudPlugin
     public InspectorWindow Inspector { get; }
     public DiagnosticsService Diagnostics { get; }
     public PortraitImportService PortraitImport { get; }
+    public PlateDesignImportService DesignImport { get; }
 
     private readonly ConfigWindow configWindow;
 
@@ -72,6 +73,32 @@ public sealed class Plugin : IDalamudPlugin
                 Services.Log.Error(ex, "[Export] direct import threw");
                 Services.ChatGui.Print("[PlatePeek] Import failed - see /xllog.");
             }
+        };
+
+        DesignImport = new PlateDesignImportService(Unlocks);
+        Inspector.IsDesignEditorOpen = DesignImport.IsDesignEditorOpen;
+        Inspector.OnCopyDesign = view =>
+        {
+            ImGui.SetClipboardText(PlateDesignCodec.Encode(DesignSnapshot.FromPlate(view.Snapshot)));
+            Services.ChatGui.Print("[PlatePeek] Design code copied.");
+        };
+        Inspector.OnImportDesign = view =>
+        {
+            var ok = DesignImport.TryImport(DesignSnapshot.FromPlate(view.Snapshot), out var message);
+            Services.ChatGui.Print($"[PlatePeek] {view.Snapshot.Name}: {message}");
+            Services.Log.Info($"[Export] design import {(ok ? "ok" : "failed")}: {message}");
+        };
+        Inspector.OnPasteDesign = () =>
+        {
+            var design = PlateDesignCodec.Decode(ImGui.GetClipboardText());
+            if (design == null)
+            {
+                Services.ChatGui.Print("[PlatePeek] Clipboard does not contain a valid design code.");
+                return;
+            }
+            var ok = DesignImport.TryImport(design, out var message);
+            Services.ChatGui.Print($"[PlatePeek] {message}");
+            Services.Log.Info($"[Export] design paste {(ok ? "ok" : "failed")}: {message}");
         };
 
         Capture.SnapshotCaptured += snapshot =>

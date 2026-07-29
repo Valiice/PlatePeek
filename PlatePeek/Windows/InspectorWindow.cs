@@ -24,6 +24,10 @@ public class InspectorWindow : Window
     public Action<ResolvedPlateView>? OnCopyText;
     public Action<ResolvedPlateView>? OnImportPortrait;
     public Func<bool>? IsBannerEditorOpen;
+    public Action<ResolvedPlateView>? OnCopyDesign;
+    public Action<ResolvedPlateView>? OnImportDesign;
+    public Action? OnPasteDesign;
+    public Func<bool>? IsDesignEditorOpen;
 
     public InspectorWindow() : base("PlatePeek###PlatePeekInspector")
     {
@@ -157,6 +161,25 @@ public class InspectorWindow : Window
         ImGui.SameLine();
         if (ImGui.Button("Copy as text"))
             OnCopyText?.Invoke(view);
+
+        if (ImGui.Button("Copy design code"))
+            OnCopyDesign?.Invoke(view);
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip("Copies the plate design layers as a code other PlatePeek users can import.");
+        ImGui.SameLine();
+        var designEditorOpen = IsDesignEditorOpen?.Invoke() ?? false;
+        using (ImRaii.Disabled(!designEditorOpen))
+        {
+            if (ImGui.Button("Import design"))
+                OnImportDesign?.Invoke(view);
+            ImGui.SameLine();
+            if (ImGui.Button("Paste design code"))
+                OnPasteDesign?.Invoke();
+        }
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+            ImGui.SetTooltip(designEditorOpen
+                ? "Import design applies this capture; Paste design code applies a code from your clipboard.\nCheck the preview and hit Save after."
+                : "Open your plate design editor first: your plate > Edit Plate > Edit Design.");
     }
 
     private static void DrawItemTable(string id, IReadOnlyList<ResolvedItem> items, bool showCategory = true)
