@@ -20,6 +20,7 @@ public sealed class Plugin : IDalamudPlugin
     public DiagnosticsService Diagnostics { get; }
     public PortraitImportService PortraitImport { get; }
     public PlateDesignImportService DesignImport { get; }
+    public DesignProbe Probe { get; }
 
     private readonly ConfigWindow configWindow;
 
@@ -75,6 +76,7 @@ public sealed class Plugin : IDalamudPlugin
             }
         };
 
+        Probe = new DesignProbe();
         DesignImport = new PlateDesignImportService(Unlocks);
         Inspector.IsDesignEditorOpen = DesignImport.IsDesignEditorOpen;
         Inspector.OnCopyDesign = view =>
@@ -141,6 +143,12 @@ public sealed class Plugin : IDalamudPlugin
             return;
         }
 
+        if (trimmed.Equals("probe", StringComparison.OrdinalIgnoreCase))
+        {
+            Probe.Toggle();
+            return;
+        }
+
         configWindow.Toggle();
     }
 
@@ -156,6 +164,7 @@ public sealed class Plugin : IDalamudPlugin
         Services.CommandManager.RemoveHandler(CommandName);
         Capture.Dispose();
         Unlocks.Dispose();
+        Probe.Dispose();
         WindowSystem.RemoveAllWindows();
     }
 }
