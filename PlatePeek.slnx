@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="PlatePeek.Core/PlatePeek.Core.csproj" />
+  <Project Path="PlatePeek.Tests/PlatePeek.Tests.csproj" />
+  <Project Path="PlatePeek/PlatePeek.csproj" />
+</Solution>
