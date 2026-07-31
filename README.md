@@ -1,6 +1,19 @@
 # PlatePeek
 
+[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Valiice/PlatePeek/total?style=flat-square&color=blue)](https://github.com/Valiice/PlatePeek/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/Valiice/PlatePeek?include_prereleases&style=flat-square&color=green)](https://github.com/Valiice/PlatePeek/releases/latest)
+[![GitHub Issues](https://img.shields.io/github/issues/Valiice/PlatePeek?style=flat-square)](https://github.com/Valiice/PlatePeek/issues)
+[![Download Latest Zip](https://img.shields.io/badge/Download-Latest%20Zip-blue?style=flat-square)](https://github.com/Valiice/PlatePeek/releases/latest/download/PlatePeek.zip)
+
 Dalamud plugin that shows you how any adventurer plate was made, and lets you copy it.
+
+## Installation
+
+1. Add my custom plugin repository: [https://raw.githubusercontent.com/Valiice/DalamudPluginRepo/master/repo.json](https://github.com/Valiice/DalamudPluginRepo)
+2. Search for **PlatePeek** in the Plugin Installer.
+3. Install and Enable.
+
+Not on the official repo. Alternatively, build with `dotnet build` and load as a dev plugin.
 
 When you view someone's adventurer plate, PlatePeek opens a window next to it with everything they used:
 
@@ -47,7 +60,3 @@ PlatePeek only reads data the game client already received to display the plate.
 - After a direct import, the editor's dropdown labels may show stale names until touched. The rendered portrait and saved values are correct.
 - Gendered titles display their masculine form.
 - Ownership marks show "?" until the unlock cache is first built (open any plate/portrait editor once).
-
-## Installation
-
-Not on the official repo. Install via my [plugin repository](https://github.com/Valiice/DalamudPluginRepo), or build with `dotnet build` and load as a dev plugin.
