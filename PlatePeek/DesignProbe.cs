@@ -97,7 +97,7 @@ public sealed unsafe class DesignProbe : IDisposable
                 AtkValueType.UInt => $"uint:{v.UInt}",
                 AtkValueType.Bool => $"bool:{v.Byte != 0}",
                 AtkValueType.Float => $"float:{v.Float}",
-                AtkValueType.String or AtkValueType.ManagedString or AtkValueType.String8 => $"str:{v.String}",
+                AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString => $"str:{v.String}",
                 _ => $"{v.Type}:0x{v.Int:X}",
             });
         }

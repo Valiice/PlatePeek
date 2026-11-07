@@ -10,7 +10,9 @@ public sealed record ResolvedItem(
     bool? Unlocked,
     string? UnlockHint,
     uint IconId,
-    string? LinkUrl = null);
+    string? LinkUrl = null,
+    byte Stain0 = 0,
+    byte Stain1 = 0);
 
 /// <summary>Everything the UI, text summary, and JSON dump need: snapshot
 /// plus all names resolved. Built by the plugin, consumed by Core.</summary>

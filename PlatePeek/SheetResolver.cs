@@ -74,8 +74,8 @@ public sealed class SheetResolver
                     poseName = emote.Name.ExtractText();
             }
             poseUnlocked = unlocks.GetUnlockState(timeline.UnlockCondition.RowId);
-            var (poseHint, poseUrl) = poseUnlocked == true ? (null, null) : unlocks.GetUnlockInfo(timeline.UnlockCondition.RowId);
-            if (poseUnlocked != true && poseUrl == null && poseName.Length > 0)
+            var (poseHint, poseUrl) = unlocks.GetUnlockInfo(timeline.UnlockCondition.RowId);
+            if (poseUrl == null && poseName.Length > 0)
                 poseUrl = SearchUrl(poseName, "portrait pose");
             portraitItems.Add(new ResolvedItem("Pose", s.Portrait.BannerTimeline, poseName, poseUnlocked,
                 poseHint, (uint)timeline.Icon, poseUrl));
@@ -97,12 +97,16 @@ public sealed class SheetResolver
                 dyes.Add(stain1.Name.ExtractText());
             if (dyes.Count > 0)
                 name += $" ({string.Join(", ", dyes)})";
-            gearItems.Add(new ResolvedItem("Item", piece.ItemId, name, null, null, item.Icon));
+            gearItems.Add(new ResolvedItem("Item", piece.ItemId, name, null, null, item.Icon,
+                $"https://www.garlandtools.org/db/#item/{piece.ItemId}", piece.Stain0, piece.Stain1));
         }
         foreach (var glassesId in new[] { s.Glasses0, s.Glasses1 })
         {
             if (glassesId != 0 && Services.DataManager.GetExcelSheet<Glasses>().TryGetRow(glassesId, out var glasses))
-                gearItems.Add(new ResolvedItem("Glasses", glassesId, glasses.Name.ExtractText(), null, null, (uint)glasses.Icon));
+            {
+                var name = glasses.Name.ExtractText();
+                gearItems.Add(new ResolvedItem("Glasses", glassesId, name, null, null, (uint)glasses.Icon, SearchUrl(name, "facewear")));
+            }
         }
 
         // Profile names
@@ -116,16 +120,32 @@ public sealed class SheetResolver
 
         var worldName = Services.DataManager.GetExcelSheet<World>().TryGetRow(s.WorldId, out var world)
             ? world.Name.ExtractText() : "";
+        // ClassJob.Name is lowercase ("dark knight"); title-case it for display.
+        var titleCase = System.Globalization.CultureInfo.InvariantCulture.TextInfo;
         var jobName = Services.DataManager.GetExcelSheet<ClassJob>().TryGetRow(s.ClassJobId, out var job)
-            ? job.Name.ExtractText() : "";
+            ? titleCase.ToTitleCase(job.Name.ExtractText()) : "";
         var preferredJobName = Services.DataManager.GetExcelSheet<ClassJob>().TryGetRow(s.PreferredClassJobId, out var prefJob)
-            ? prefJob.Name.ExtractText() : "";
-        var titleName = s.TitleId != 0 && Services.DataManager.GetExcelSheet<Title>().TryGetRow(s.TitleId, out var title)
-            ? title.Masculine.ExtractText() : "";
+            ? titleCase.ToTitleCase(prefJob.Name.ExtractText()) : "";
+        var titleName = "";
+        if (s.TitleId != 0 && Services.DataManager.GetExcelSheet<Title>().TryGetRow(s.TitleId, out var title))
+        {
+            titleName = s.Sex == 1 ? title.Feminine.ExtractText() : "";
+            if (titleName.Length == 0)
+                titleName = title.Masculine.ExtractText();
+        }
         var gcName = s.GrandCompany != 0 && Services.DataManager.GetExcelSheet<GrandCompany>().TryGetRow(s.GrandCompany, out var gc)
             ? gc.Name.ExtractText() : "";
 
+        // BannerFacial row id = portrait expression index; the display name lives on its Emote.
         var expressionName = s.Portrait.Expression == 0 ? "None" : $"#{s.Portrait.Expression}";
+        if (s.Portrait.Expression != 0
+            && Services.DataManager.GetExcelSheet<BannerFacial>().TryGetRow(s.Portrait.Expression, out var facial)
+            && facial.Emote.IsValid)
+        {
+            var emoteName = facial.Emote.Value.Name.ExtractText();
+            if (emoteName.Length > 0)
+                expressionName = emoteName;
+        }
 
         return new ResolvedPlateView
         {
@@ -149,8 +169,8 @@ public sealed class SheetResolver
     private ResolvedItem MakeItem(string category, uint rowId, string name, uint unlockConditionRowId, uint iconId)
     {
         var unlocked = unlocks.GetUnlockState(unlockConditionRowId);
-        var (hint, url) = unlocked == true ? (null, null) : unlocks.GetUnlockInfo(unlockConditionRowId);
-        if (unlocked != true && url == null && name.Length > 0)
+        var (hint, url) = unlocks.GetUnlockInfo(unlockConditionRowId);
+        if (url == null && name.Length > 0)
             url = SearchUrl(name, category);
         return new ResolvedItem(category, rowId, name.Length > 0 ? name : $"#{rowId}", unlocked, hint, iconId, url);
     }

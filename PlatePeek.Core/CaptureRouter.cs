@@ -9,9 +9,15 @@ namespace PlatePeek.Core;
 /// </summary>
 public sealed class CaptureRouter
 {
+    private const int MaxHistory = 10;
+    private readonly List<ResolvedPlateView> history = new();
+
     public ResolvedPlateView? View { get; private set; }
     public ResolvedPlateView? Stashed { get; private set; }
     public bool Pinned { get; set; }
+
+    /// <summary>Most recent first, one entry per character, newest 10.</summary>
+    public IReadOnlyList<ResolvedPlateView> History => history;
 
     /// <summary>True when a different character is waiting in the stash.</summary>
     public bool CanSwitch =>
@@ -19,6 +25,11 @@ public sealed class CaptureRouter
 
     public void Accept(ResolvedPlateView incoming)
     {
+        history.RemoveAll(h => h.Snapshot.ContentId == incoming.Snapshot.ContentId);
+        history.Insert(0, incoming);
+        if (history.Count > MaxHistory)
+            history.RemoveAt(history.Count - 1);
+
         if (View != null && View.Snapshot.ContentId == incoming.Snapshot.ContentId)
         {
             View = incoming;
@@ -41,5 +52,15 @@ public sealed class CaptureRouter
     {
         if (CanSwitch)
             (View, Stashed) = (Stashed, View);
+    }
+
+    /// <summary>Brings a history entry to the screen; the current view becomes the stash.</summary>
+    public void Show(ResolvedPlateView entry)
+    {
+        if (View == entry)
+            return;
+        if (View != null)
+            Stashed = View;
+        View = entry;
     }
 }

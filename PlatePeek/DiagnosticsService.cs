@@ -1,17 +1,10 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using PlatePeek.Core;
 
 namespace PlatePeek;
 
 public sealed class DiagnosticsService
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        WriteIndented = true,
-        Converters = { new HalfJsonConverter() },
-    };
-
     private const int MaxRetainedDumps = 20;
 
     private readonly Configuration config;
@@ -53,7 +46,7 @@ public sealed class DiagnosticsService
 
             var dir = Path.Combine(Services.PluginInterface.GetPluginConfigDirectory(), "dumps");
             Directory.CreateDirectory(dir);
-            var json = JsonSerializer.Serialize(dump, JsonOptions);
+            var json = JsonSerializer.Serialize(dump, PlateSnapshotJson.Options);
             File.WriteAllText(Path.Combine(dir, "latest.json"), json);
 
             var safeName = Sanitize(snapshot.Name.Replace(' ', '_'));
@@ -68,7 +61,7 @@ public sealed class DiagnosticsService
     }
 
     /// <summary>Keeps only the newest <see cref="MaxRetainedDumps"/> timestamped dump files,
-    /// so DebugDumps (on by default) doesn't grow the dumps directory unbounded over a play
+    /// so DebugDumps doesn't grow the dumps directory unbounded over a play
     /// session. latest.json is untouched. Filenames sort correctly by name since the
     /// yyyyMMdd-HHmmss timestamp prefix is fixed-width and zero-padded.</summary>
     private static void PruneOldDumps(string dir)
@@ -105,7 +98,7 @@ public sealed class DiagnosticsService
         Check("unlock check runs", () =>
         {
             // Condition 0 must always be "unlocked"; a bogus id must not throw.
-            var u = new UnlockService();
+            using var u = new UnlockService();
             return u.GetUnlockState(0) == true && u.GetUnlockState(0xFFFF) != true;
         });
         Check("plate capture (needs a plate open)", () =>
@@ -130,14 +123,5 @@ public sealed class DiagnosticsService
         {
             Services.Log.Error(ex, $"[SELFTEST] ERROR {name}");
         }
-    }
-
-    private sealed class HalfJsonConverter : JsonConverter<Half>
-    {
-        public override Half Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => (Half)reader.GetSingle();
-
-        public override void Write(Utf8JsonWriter writer, Half value, JsonSerializerOptions options)
-            => writer.WriteNumberValue((float)value);
     }
 }

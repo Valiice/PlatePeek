@@ -21,23 +21,30 @@ When you view someone's adventurer plate, PlatePeek opens a window next to it wi
 - Portrait: background, frame, accent, the pose with its exact paused animation frame, expression, camera zoom and rotation, lighting, and the gear worn in the portrait (dyes and glasses included)
 - Profile: favored job, Grand Company rank, Free Company, playstyles, active hours and search comment
 
-## Copying a portrait
+## Copying a look
 
-Three buttons at the top of the window:
+Buttons at the top of the window:
 
 - Copy portrait preset: copies a preset string compatible with HaselTweaks' Portrait Helper. Paste it into Portrait Helper, save it for later, or share it with friends.
 - Import into my portrait editor: applies the captured pose, animation frame, camera, lighting and expression directly into your open portrait editor, plus background/frame/accent if you own them (locked items are skipped and listed in chat). Hit Save and it's yours. Works with both the plate portrait (Edit Plate menu) and gearset portraits (Portraits list). Plays nice with Photobooth for fine-tuning afterwards.
-- Copy as text: a readable summary of the plate design for recreating it in the Edit Plate menu.
+- Copy as text: a readable summary of the plate for recreating it by hand.
+- Copy look code: design layers and portrait settings as one shareable string.
+- Paste code: loads a look code, a design code or a Portrait Helper preset from your clipboard into the inspector, with names and ownership resolved, so you can inspect it and use the Import buttons on it.
+- Import design: writes the design layers into your open Edit Design window (locked or unknown layers are skipped). Hit Save to keep it.
 
-Walking to your editor is safe. A captured player stays on screen, and your own plate waits behind a "Switch to" button instead of replacing them.
+Walking to your editor is safe. A captured player stays on screen, and your own plate waits behind a "Switch to" button instead of replacing them. The "Recent plates" dropdown goes back to any of the last 10 captures.
 
-Plate design layers can't be applied automatically (the game has no API for it), so for those you recreate the look by hand with the names PlatePeek gives you.
+Save favorite stores the current plate under a name in the plugin config folder; the Favorites dropdown loads or deletes them later.
+
+Gear rows have a "Try on" button that previews the piece with its dyes in the game's fitting room.
+
+The Design and Portrait tabs start with a line like "You own 7 of 9 design pieces" listing what you're missing.
 
 ## Ownership checks
 
 The game only exposes unlock states while one of its own editors is open. The first time you open the Edit Plate menu or portrait editor, PlatePeek checks every unlock condition and caches the results per character, so ownership marks keep working everywhere, including across restarts. Until that first check, unknown items show a "?" instead of a wrong answer.
 
-Anything you're missing is clickable: the Missing/? status opens the item's source on FFXIV Collect (emotes, achievements, mounts, minions), Garland Tools (items), or a web search when the game data doesn't name a source.
+Every name in the inspector is clickable: design layers, portrait pieces and poses open their unlock source on FFXIV Collect (emotes, achievements, mounts, minions) or Garland Tools (items), gear opens Garland Tools, and anything without a known source falls back to a web search. The Missing/? status still shows the source as a tooltip.
 
 ## Commands
 
@@ -49,7 +56,7 @@ Anything you're missing is clickable: the Missing/? status opens the item's sour
 
 ## Settings
 
-Auto-open on plate view (on by default), ignore your own plate, and debug dumps (writes captured plates as JSON to the plugin config folder, capped at the newest 20).
+Auto-open on plate view (on by default), ignore your own plate, open next to the plate window (on by default), and debug dumps (writes captured plates as JSON to the plugin config folder, capped at the newest 20).
 
 ## Privacy and safety
 
@@ -58,5 +65,4 @@ PlatePeek only reads data the game client already received to display the plate.
 ## Known limitations
 
 - After a direct import, the editor's dropdown labels may show stale names until touched. The rendered portrait and saved values are correct.
-- Gendered titles display their masculine form.
 - Ownership marks show "?" until the unlock cache is first built (open any plate/portrait editor once).

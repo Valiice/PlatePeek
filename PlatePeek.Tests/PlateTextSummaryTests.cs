@@ -55,6 +55,17 @@ public class PlateTextSummaryTests
         Assert.Contains("Playstyles: Raids, Trials", text);
     }
 
+    [Theory]
+    [InlineData(0u, "none set")]
+    [InlineData(0xFFFFFFu, "all day")]
+    [InlineData(0b1u, "00:00-01:00")]
+    [InlineData(0b111111u | (0b111111u << 18), "00:00-06:00, 18:00-24:00")]
+    [InlineData(0b101u, "00:00-01:00, 02:00-03:00")]
+    public void FormatActiveHours_CollapsesConsecutiveHoursIntoRanges(uint mask, string expected)
+    {
+        Assert.Equal(expected, PlateTextSummary.FormatActiveHours(mask));
+    }
+
     [Fact]
     public void Format_MarksUnlockedItemsWithoutLockNote()
     {

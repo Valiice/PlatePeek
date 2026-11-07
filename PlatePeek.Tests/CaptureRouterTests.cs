@@ -114,6 +114,33 @@ public class CaptureRouterTests
     }
 
     [Fact]
+    public void History_IsMostRecentFirst_DedupedByCharacter_CappedAtTen()
+    {
+        var router = new CaptureRouter();
+        for (ulong i = 1; i <= 12; i++)
+            router.Accept(Player(i, isSelf: false, $"P{i}"));
+        router.Accept(Player(5, isSelf: false, "P5 again"));
+
+        Assert.Equal(10, router.History.Count);
+        Assert.Equal("P5 again", router.History[0].Snapshot.Name);
+        Assert.Equal("P12", router.History[1].Snapshot.Name);
+        Assert.Single(router.History, h => h.Snapshot.ContentId == 5);
+        Assert.DoesNotContain(router.History, h => h.Snapshot.ContentId <= 2);
+    }
+
+    [Fact]
+    public void Show_BringsEntryToScreen_AndStashesCurrent()
+    {
+        var router = new CaptureRouter();
+        router.Accept(Player(1, isSelf: false, "A"));
+        router.Accept(Player(2, isSelf: false, "B"));
+        router.Show(router.History[1]);
+
+        Assert.Equal("A", router.View?.Snapshot.Name);
+        Assert.Equal("B", router.Stashed?.Snapshot.Name);
+    }
+
+    [Fact]
     public void StashedCharacterUpdate_RefreshesStash()
     {
         var router = new CaptureRouter();

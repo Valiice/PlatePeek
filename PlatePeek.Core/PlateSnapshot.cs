@@ -27,6 +27,8 @@ public sealed record PlateSnapshot
     public byte ClassJobId { get; init; }
     public ushort Level { get; init; }
     public ushort TitleId { get; init; }
+    /// <summary>0 = male, 1 = female; picks the title form.</summary>
+    public byte Sex { get; init; }
     public byte GrandCompany { get; init; }
     public byte GcRank { get; init; }
     public string FreeCompany { get; init; } = "";

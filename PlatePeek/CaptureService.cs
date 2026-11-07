@@ -1,3 +1,4 @@
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
@@ -123,10 +124,11 @@ public sealed unsafe class CaptureService : IDisposable
             ClassJobId = s->ClassJobId,
             Level = s->Level,
             TitleId = s->TitleId,
+            Sex = s->Sex,
             GrandCompany = s->GrandCompany,
             GcRank = s->GcRank,
             FreeCompany = s->FreeCompany.ToString(),
-            SearchComment = s->SearchComment.ToString(),
+            SearchComment = SeString.Parse(s->SearchComment.AsSpan()).TextValue,
             PreferredClassJobId = s->PreferredClassJobId,
             PlayStyles = playStyles,
             ActiveHoursWeekdays = s->ActiveHoursWeekdays,

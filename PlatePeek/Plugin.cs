@@ -2,6 +2,7 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using PlatePeek.Core;
 using PlatePeek.Windows;
 
@@ -21,6 +22,7 @@ public sealed class Plugin : IDalamudPlugin
     public PortraitImportService PortraitImport { get; }
     public PlateDesignImportService DesignImport { get; }
     public DesignProbe Probe { get; }
+    public FavoritesService Favorites { get; }
 
     private readonly ConfigWindow configWindow;
 
@@ -79,10 +81,10 @@ public sealed class Plugin : IDalamudPlugin
         Probe = new DesignProbe();
         DesignImport = new PlateDesignImportService(Unlocks);
         Inspector.IsDesignEditorOpen = DesignImport.IsDesignEditorOpen;
-        Inspector.OnCopyDesign = view =>
+        Inspector.OnCopyLook = view =>
         {
-            ImGui.SetClipboardText(PlateDesignCodec.Encode(DesignSnapshot.FromPlate(view.Snapshot)));
-            Services.ChatGui.Print("[PlatePeek] Design code copied.");
+            ImGui.SetClipboardText(LookCodec.Encode(view.Snapshot));
+            Services.ChatGui.Print("[PlatePeek] Look code copied - design and portrait in one string.");
         };
         Inspector.OnImportDesign = view =>
         {
@@ -90,25 +92,54 @@ public sealed class Plugin : IDalamudPlugin
             Services.ChatGui.Print($"[PlatePeek] {view.Snapshot.Name}: {message}");
             Services.Log.Info($"[Export] design import {(ok ? "ok" : "failed")}: {message}");
         };
-        Inspector.OnPasteDesign = () =>
+        Inspector.OnPasteLook = () =>
         {
-            var design = PlateDesignCodec.Decode(ImGui.GetClipboardText());
-            if (design == null)
+            var decoded = LookCodec.Decode(ImGui.GetClipboardText());
+            if (decoded == null)
             {
-                Services.ChatGui.Print("[PlatePeek] Clipboard does not contain a valid design code.");
+                Services.ChatGui.Print("[PlatePeek] Clipboard does not contain a look code, design code or portrait preset.");
                 return;
             }
-            var ok = DesignImport.TryImport(design, out var message);
-            Services.ChatGui.Print($"[PlatePeek] {message}");
-            Services.Log.Info($"[Export] design paste {(ok ? "ok" : "failed")}: {message}");
+            Inspector.Present(Resolver.Resolve(LookCodec.ToSnapshot(decoded.Value.Design, decoded.Value.Portrait)));
+            Services.ChatGui.Print("[PlatePeek] Pasted look loaded. Use the Import buttons to apply it.");
         };
+
+        Inspector.OnTryOn = item =>
+        {
+            var ok = AgentTryon.TryOn(0, item.RowId, item.Stain0, item.Stain1);
+            if (!ok)
+                Services.ChatGui.Print("[PlatePeek] Could not open the fitting room for that item.");
+        };
+
+        Favorites = new FavoritesService();
+        Inspector.ListFavorites = Favorites.List;
+        Inspector.OnSaveFavorite = (name, view) =>
+        {
+            Favorites.Save(name, view.Snapshot);
+            Services.ChatGui.Print($"[PlatePeek] Saved favorite \"{name}\".");
+        };
+        Inspector.OnLoadFavorite = name =>
+        {
+            var snapshot = Favorites.Load(name);
+            if (snapshot == null)
+            {
+                Services.ChatGui.Print($"[PlatePeek] Favorite \"{name}\" could not be read.");
+                return;
+            }
+            Inspector.Present(Resolver.Resolve(snapshot));
+        };
+        Inspector.OnDeleteFavorite = Favorites.Delete;
 
         Capture.SnapshotCaptured += snapshot =>
         {
             var resolved = Resolver.Resolve(snapshot);
             Inspector.SetSnapshot(resolved);
             if (Config.AutoOpen && !(Config.IgnoreOwnPlate && snapshot.IsSelf))
+            {
+                if (!Inspector.IsOpen && Config.DockToPlate)
+                    Inspector.RequestDock();
                 Inspector.IsOpen = true;
+            }
         };
         Capture.PlateClosed += Inspector.OnPlateClosed;
 

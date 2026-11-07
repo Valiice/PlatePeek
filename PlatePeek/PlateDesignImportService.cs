@@ -85,15 +85,17 @@ public sealed unsafe class PlateDesignImportService
 
         message = skipped.Count == 0
             ? "Design imported. Check the preview and hit Save."
-            : $"Design imported. Skipped locked: {string.Join(", ", skipped)}. Hit Save to keep the rest.";
+            : $"Design imported. Skipped locked or unknown: {string.Join(", ", skipped)}. Hit Save to keep the rest.";
         return true;
     }
 
+    /// <summary>True when the layer must not be written: known locked, or the row
+    /// id is not in the sheet at all (a corrupt or hand-edited design code).</summary>
     private bool IsLocked<TSheet>(uint rowId)
         where TSheet : struct, Lumina.Excel.IExcelRow<TSheet>
     {
         if (!Services.DataManager.GetExcelSheet<TSheet>().TryGetRow(rowId, out var row))
-            return false;
+            return true;
 
         var conditionRowId = (object)row switch
         {
