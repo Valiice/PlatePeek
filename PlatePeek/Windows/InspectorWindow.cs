@@ -19,8 +19,8 @@ public class InspectorWindow : Window
 
     public bool Pinned
     {
-        get => router.Pinned;
-        set => router.Pinned = value;
+        get => !router.Pinned;
+        set => router.Pinned = !value;
     }
 
     public Action<ResolvedPlateView>? OnCopyPreset;
@@ -45,13 +45,8 @@ public class InspectorWindow : Window
         };
     }
 
-    /// <summary>Stores the resolved view without opening the window. Routing
-    /// rules (captured players keep the screen, own plate stashes, pin freezes)
-    /// live in <see cref="CaptureRouter"/>.</summary>
     public void SetSnapshot(ResolvedPlateView newView) => router.Accept(newView);
 
-    /// <summary>Puts a loaded favorite or pasted code on screen and opens the window,
-    /// bypassing the own-plate stash rule.</summary>
     public void Present(ResolvedPlateView newView)
     {
         router.Accept(newView);
@@ -59,18 +54,14 @@ public class InspectorWindow : Window
         IsOpen = true;
     }
 
-    /// <summary>Next frame, place the window to the right of the plate window.</summary>
     public void RequestDock() => dockPending = true;
 
-    public void OnPlateClosed()
-    {
-        if (!Pinned)
-            IsOpen = false;
-    }
+    public void OnPlateClosed() => IsOpen = false;
 
     public override void PreDraw()
     {
-        if (!dockPending)
+        Position = null;
+        if (!Pinned && !dockPending)
             return;
 
         var addon = Services.GameGui.GetAddonByName("CharaCard");
@@ -81,13 +72,7 @@ public class InspectorWindow : Window
         }
     }
 
-    public override void PostDraw()
-    {
-        if (!dockPending)
-            return;
-        dockPending = false;
-        Position = null;
-    }
+    public override void PostDraw() => dockPending = false;
 
     public override void Draw()
     {
@@ -100,7 +85,6 @@ public class InspectorWindow : Window
 
         var s = view.Snapshot;
 
-        // Header
         ImGui.TextUnformatted($"{s.Name} @ {s.WorldName}");
         ImGui.SameLine();
         ImGui.TextDisabled($"Lv{s.Level} {view.JobName}" + (view.TitleName.Length > 0 ? $" <{view.TitleName}>" : ""));
@@ -304,7 +288,6 @@ public class InspectorWindow : Window
         }
     }
 
-    /// <summary>"You own 7 of 9 design pieces. Missing: ..." for someone else's plate.</summary>
     private void DrawOwnershipSummary(IReadOnlyList<ResolvedItem> items, string what)
     {
         if (view == null || view.Snapshot.IsSelf)
@@ -326,8 +309,6 @@ public class InspectorWindow : Window
 
     private void DrawItemTable(string id, IReadOnlyList<ResolvedItem> items, bool showCategory = true)
     {
-        // Icon gets its own fixed column so wide plate textures don't push the text around.
-        // Last column is the unlock status, or a "Try on" button for gear.
         if (!ImGui.BeginTable($"###platePeek_{id}", showCategory ? 4 : 3, ImGuiTableFlags.SizingFixedFit))
             return;
 
@@ -372,8 +353,6 @@ public class InspectorWindow : Window
         ImGui.EndTable();
     }
 
-    /// <summary>24px-high thumbnail keeping the texture's aspect ratio (plate layers are
-    /// wide strips, not square icons). Hovering a non-square one shows it full size.</summary>
     private static void DrawIcon(uint iconId)
     {
         if (iconId == 0)
