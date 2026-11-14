@@ -21,8 +21,6 @@ public class CaptureRouterTests
     [Fact]
     public void OwnPlate_DoesNotReplaceCapturedPlayer_GoesToStash()
     {
-        // The regression that broke import: walking to your editor opens your
-        // own plate, which must not clobber the captured target.
         var router = new CaptureRouter();
         router.Accept(Player(1, isSelf: false, "Lisana"));
         router.Accept(Player(2, isSelf: true, "Va Li"));
@@ -61,8 +59,6 @@ public class CaptureRouterTests
     [Fact]
     public void UnpinThenReacceptStashedCharacter_KeepsPreviousViewReachable()
     {
-        // Regression: pin, capture a second player (stashed), unpin, then open
-        // that second player's plate again. The first player must not be lost.
         var router = new CaptureRouter();
         router.Accept(Player(1, isSelf: false, "Lisana"));
         router.Pinned = true;
@@ -90,8 +86,6 @@ public class CaptureRouterTests
     [Fact]
     public void SameCharacterUpdate_AppliesInPlace_EvenWhenPinned()
     {
-        // Unlock-cache harvests re-resolve the same snapshot; the refresh must
-        // land even while pinned.
         var router = new CaptureRouter();
         router.Accept(Player(1, isSelf: false, "Lisana"));
         router.Pinned = true;

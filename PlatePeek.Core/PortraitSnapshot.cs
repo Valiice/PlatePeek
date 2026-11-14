@@ -1,10 +1,5 @@
 namespace PlatePeek.Core;
 
-/// <summary>
-/// A managed copy of the game's ExportedPortraitData, plus BannerFrame and
-/// BannerDecoration which the game stores next to it rather than inside it.
-/// Field types mirror the binary preset format exactly.
-/// </summary>
 public sealed record PortraitSnapshot
 {
     public Half CameraPositionX { get; init; }

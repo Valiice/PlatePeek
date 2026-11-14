@@ -31,7 +31,6 @@ public class PortraitPresetCodecTests
     {
         var bytes = Convert.FromBase64String(PortraitPresetCodec.Encode(Sample()));
         Assert.Equal(58, bytes.Length);
-        // "HTPS" magic, little-endian int32 0x53505448
         Assert.Equal((byte)'H', bytes[0]);
         Assert.Equal((byte)'T', bytes[1]);
         Assert.Equal((byte)'P', bytes[2]);
@@ -52,7 +51,7 @@ public class PortraitPresetCodecTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("not base64 !!!")]
-    [InlineData("AAAA")] // valid base64, too short
+    [InlineData("AAAA")]
     public void Decode_ReturnsNullOnInvalidInput(string? input)
     {
         Assert.Null(PortraitPresetCodec.Decode(input));

@@ -1,8 +1,5 @@
 namespace PlatePeek.Core;
 
-/// <summary>One display row: a category label, the raw row id, resolved name,
-/// unlock state for the local player (null = not applicable), an optional
-/// unlock hint, and a game icon id (0 = none).</summary>
 public sealed record ResolvedItem(
     string Category,
     uint RowId,
@@ -14,8 +11,6 @@ public sealed record ResolvedItem(
     byte Stain0 = 0,
     byte Stain1 = 0);
 
-/// <summary>Everything the UI, text summary, and JSON dump need: snapshot
-/// plus all names resolved. Built by the plugin, consumed by Core.</summary>
 public sealed record ResolvedPlateView
 {
     public PlateSnapshot Snapshot { get; init; } = new();

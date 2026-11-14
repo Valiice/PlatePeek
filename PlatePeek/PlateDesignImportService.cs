@@ -4,14 +4,6 @@ using PlatePeek.Core;
 
 namespace PlatePeek;
 
-/// <summary>
-/// Writes a captured plate design into the player's own open Edit Plate Design
-/// window. The editor's live state is AgentCharaCard.Storage.PlateDesign (the
-/// game snapshots it into BackupPlateDesign and restores on cancel), so values
-/// written here go through the game's normal save path when the player hits
-/// Save. Known-locked layers are skipped; the server validates everything on
-/// save regardless.
-/// </summary>
 public sealed unsafe class PlateDesignImportService
 {
     private const string DesignAddonName = "CharaCardDesignSetting";
@@ -89,8 +81,6 @@ public sealed unsafe class PlateDesignImportService
         return true;
     }
 
-    /// <summary>True when the layer must not be written: known locked, or the row
-    /// id is not in the sheet at all (a corrupt or hand-edited design code).</summary>
     private bool IsLocked<TSheet>(uint rowId)
         where TSheet : struct, Lumina.Excel.IExcelRow<TSheet>
     {

@@ -1,6 +1,5 @@
 namespace PlatePeek.Core;
 
-/// <summary>The plate design layers as a standalone, shareable unit.</summary>
 public sealed record DesignSnapshot
 {
     public ushort BasePlate { get; init; }
@@ -19,15 +18,9 @@ public sealed record DesignSnapshot
     };
 }
 
-/// <summary>
-/// Reads and writes PlatePeek design code strings (magic "PPDS", version 1).
-/// Layout is little-endian: int32 magic, ushort version, ushort base plate,
-/// byte top border, byte bottom border, byte invert flag, byte decoration
-/// count, then count x ushort decoration row ids. Base64 encoded.
-/// </summary>
 public static class PlateDesignCodec
 {
-    private const int Magic = 0x53445050; // "PPDS"
+    private const int Magic = 0x53445050;
     private const ushort Version = 1;
 
     public static string Encode(DesignSnapshot d)

@@ -1,12 +1,5 @@
 namespace PlatePeek.Core;
 
-/// <summary>
-/// Decides which captured plate the inspector shows. Captured players always
-/// keep the screen: the local player's own plate (opened e.g. to reach the
-/// portrait editor) is stashed behind a switch action instead of replacing
-/// them. While pinned, any different character goes to the stash.
-/// Same-character updates (unlock-cache re-resolves) always apply in place.
-/// </summary>
 public sealed class CaptureRouter
 {
     private const int MaxHistory = 10;
@@ -16,10 +9,8 @@ public sealed class CaptureRouter
     public ResolvedPlateView? Stashed { get; private set; }
     public bool Pinned { get; set; }
 
-    /// <summary>Most recent first, one entry per character, newest 10.</summary>
     public IReadOnlyList<ResolvedPlateView> History => history;
 
-    /// <summary>True when a different character is waiting in the stash.</summary>
     public bool CanSwitch =>
         View != null && Stashed != null && Stashed.Snapshot.ContentId != View.Snapshot.ContentId;
 
@@ -42,7 +33,6 @@ public sealed class CaptureRouter
             return;
         }
 
-        // Incoming takes the screen; the displaced capture stays one switch away.
         if (View != null)
             Stashed = View;
         View = incoming;
@@ -54,7 +44,6 @@ public sealed class CaptureRouter
             (View, Stashed) = (Stashed, View);
     }
 
-    /// <summary>Brings a history entry to the screen; the current view becomes the stash.</summary>
     public void Show(ResolvedPlateView entry)
     {
         if (View == entry)

@@ -17,17 +17,14 @@ public sealed record GearPiece
     public byte Stain1 { get; init; }
 }
 
-/// <summary>Immutable copy of everything read from AgentCharaCard.Storage.</summary>
 public sealed record PlateSnapshot
 {
-    // Identity / profile
     public string Name { get; init; } = "";
     public string WorldName { get; init; } = "";
     public ushort WorldId { get; init; }
     public byte ClassJobId { get; init; }
     public ushort Level { get; init; }
     public ushort TitleId { get; init; }
-    /// <summary>0 = male, 1 = female; picks the title form.</summary>
     public byte Sex { get; init; }
     public byte GrandCompany { get; init; }
     public byte GcRank { get; init; }
@@ -38,24 +35,19 @@ public sealed record PlateSnapshot
     public uint ActiveHoursWeekdays { get; init; }
     public uint ActiveHoursWeekends { get; init; }
 
-    // Plate design
     public ushort BasePlate { get; init; }
     public byte TopBorder { get; init; }
     public byte BottomBorder { get; init; }
     public bool InvertPortraitPlacement { get; init; }
-    /// <summary>CharaCardDecoration row ids; type comes from that sheet's Component column.</summary>
     public IReadOnlyList<ushort> Decorations { get; init; } = [];
 
-    // Portrait
     public PortraitSnapshot Portrait { get; init; } = new();
 
-    // Portrait gear (14 slots; ItemId 0 = empty)
     public IReadOnlyList<GearPiece> Gear { get; init; } = [];
     public ushort Glasses0 { get; init; }
     public ushort Glasses1 { get; init; }
     public byte GearClassJobId { get; init; }
 
-    // Meta
     public bool IsSelf { get; init; }
     public bool WasResetDueToFantasia { get; init; }
     public ulong ContentId { get; init; }

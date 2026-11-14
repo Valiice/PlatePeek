@@ -2,7 +2,6 @@ using PlatePeek.Core;
 
 namespace PlatePeek;
 
-/// <summary>Named plate snapshots saved as JSON under the plugin config folder.</summary>
 public sealed class FavoritesService
 {
     private static string Dir

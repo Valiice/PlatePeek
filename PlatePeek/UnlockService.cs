@@ -7,12 +7,6 @@ using Lumina.Excel.Sheets;
 
 namespace PlatePeek;
 
-/// <summary>
-/// Answers "does this character own X" via BannerCondition unlock states.
-/// The native check only works while the game has the BannerCondition sheet
-/// resident (its own editors load it), so whenever one of those editors opens
-/// we sweep every condition into a per-character cache persisted to disk.
-/// </summary>
 public sealed unsafe class UnlockService : IDisposable
 {
     private static readonly string[] HarvestAddons = ["BannerEditor", "CharaCardEditMenu", "CharaCardDesignSetting"];
@@ -21,7 +15,6 @@ public sealed unsafe class UnlockService : IDisposable
     private Dictionary<uint, bool> cache = new();
     private ulong cacheContentId;
 
-    /// <summary>Raised after a harvest updates the cache, so open UI can re-resolve.</summary>
     public event System.Action? CacheUpdated;
 
     public UnlockService()
@@ -49,10 +42,6 @@ public sealed unsafe class UnlockService : IDisposable
 
     public bool IsKnownLocked(uint conditionRowId) => GetUnlockState(conditionRowId) == false;
 
-    /// <summary>Best-effort unlock source from BannerCondition's typed criteria,
-    /// with a lookup URL (FFXIV Collect / Garland Tools) when one makes sense.
-    /// UnlockType values follow EXDSchema: type1 5=Emote 6=Companion 7=Mount;
-    /// type2 11=Achievement, 5/6/8/12=Item, 2=Quest.</summary>
     public (string? Hint, string? Url) GetUnlockInfo(uint conditionRowId)
     {
         if (conditionRowId == 0)
@@ -110,7 +99,7 @@ public sealed unsafe class UnlockService : IDisposable
 
             var row = ExdModule.GetBannerConditionByIndex(index);
             if (row == null)
-                continue; // sheet (or this page) not resident; keep whatever we knew
+                continue;
 
             checkedCount++;
             var unlocked = ExdModule.GetBannerConditionUnlockState(row) == 0;
@@ -152,9 +141,7 @@ public sealed unsafe class UnlockService : IDisposable
         if (conditionRowIndexById != null)
             return;
 
-        // GetBannerConditionByIndex takes the row's ordinal position, not its id.
-        // Lumina enumerates rows in EXD file order, which matches the native
-        // ordinal for this sheet (verified in-game against the harvest).
+        // GetBannerConditionByIndex takes the row ordinal, not its id; Lumina row order matches it (verified in-game).
         conditionRowIndexById = new Dictionary<uint, uint>();
         uint i = 0;
         foreach (var row in Services.DataManager.GetExcelSheet<BannerCondition>())
@@ -192,7 +179,6 @@ public sealed unsafe class UnlockService : IDisposable
             }
             catch
             {
-                // Nothing sensible left to do; the next harvest rewrites it anyway.
             }
         }
     }

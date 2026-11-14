@@ -5,12 +5,6 @@ using PlatePeek.Core;
 
 namespace PlatePeek;
 
-/// <summary>
-/// Writes a captured portrait into the player's own open portrait editor
-/// using the game's native import function. Locked backgrounds, frames,
-/// accents, and poses are skipped (the server rejects saving them anyway);
-/// everything else (camera, lighting, expression, animation frame) applies.
-/// </summary>
 public sealed unsafe class PortraitImportService
 {
     private readonly UnlockService unlocks;
@@ -40,7 +34,6 @@ public sealed unsafe class PortraitImportService
         var data = stackalloc ExportedPortraitData[1];
         state->CharaView->ExportPortraitData(data);
 
-        // Ungated values: always apply.
         data->CameraPosition.X = p.CameraPositionX;
         data->CameraPosition.Y = p.CameraPositionY;
         data->CameraPosition.Z = p.CameraPositionZ;
@@ -68,7 +61,6 @@ public sealed unsafe class PortraitImportService
         data->AmbientLightingColorBlue = p.AmbientLightingColorBlue;
         data->AmbientLightingBrightness = p.AmbientLightingBrightness;
 
-        // Unlock-gated values: apply only what the player owns.
         if (TryGetCondition<BannerBg>(p.BannerBg, out var bgCond) && !unlocks.IsKnownLocked(bgCond))
         {
             data->BannerBg = p.BannerBg;
@@ -94,8 +86,7 @@ public sealed unsafe class PortraitImportService
         Services.Log.Debug(
             $"[Import] applying: timeline={data->BannerTimeline} progress={data->AnimationProgress:0.##} zoom={data->CameraZoom} " +
             $"bg={data->BannerBg} expr={data->Expression} camX={(float)data->CameraPosition.X:0.##}");
-        // Note: no ApplyCameraPositions here. ImportPortraitData applies the camera
-        // itself; re-applying afterwards can restore stale positions over the import.
+        // No ApplyCameraPositions after this: it restores stale positions over the import.
         state->CharaView->ImportPortraitData(data);
         Services.Log.Debug(
             $"[Import] view after import: camPos={state->CharaView->CameraPosition.X:0.##},{state->CharaView->CameraPosition.Y:0.##},{state->CharaView->CameraPosition.Z:0.##} " +
@@ -126,8 +117,6 @@ public sealed unsafe class PortraitImportService
         if (!Services.DataManager.GetExcelSheet<TSheet>().TryGetRow(rowId, out var row))
             return false;
 
-        // All four sheets used here (BannerBg, BannerFrame, BannerDecoration,
-        // BannerTimeline) expose UnlockCondition -> BannerCondition.
         conditionRowId = (object)row switch
         {
             BannerBg bg => bg.UnlockCondition.RowId,

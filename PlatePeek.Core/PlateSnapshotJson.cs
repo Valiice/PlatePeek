@@ -2,7 +2,6 @@ using System.Text.Json;
 
 namespace PlatePeek.Core;
 
-/// <summary>Shared JSON settings for favorites and debug dumps.</summary>
 public static class PlateSnapshotJson
 {
     public static readonly JsonSerializerOptions Options = new() { WriteIndented = true };

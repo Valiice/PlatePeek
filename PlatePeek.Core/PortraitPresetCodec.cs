@@ -1,13 +1,8 @@
 namespace PlatePeek.Core;
 
-/// <summary>
-/// Reads and writes the portrait preset clipboard string format used by
-/// HaselTweaks' Portrait Helper (magic "HTPS", version 1), reimplemented
-/// here for interoperability. Layout is little-endian, 58 bytes total.
-/// </summary>
 public static class PortraitPresetCodec
 {
-    private const int Magic = 0x53505448; // "HTPS"
+    private const int Magic = 0x53505448;
     private const ushort Version = 1;
 
     public static string Encode(PortraitSnapshot p)

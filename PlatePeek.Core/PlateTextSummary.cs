@@ -41,7 +41,6 @@ public static class PlateTextSummary
         return sb.ToString();
     }
 
-    /// <summary>24-bit hour mask (bit 0 = 00:00) as ranges: "00:00-06:00, 18:00-24:00".</summary>
     public static string FormatActiveHours(uint bitmask)
     {
         bitmask &= 0xFFFFFF;

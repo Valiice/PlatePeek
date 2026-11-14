@@ -69,7 +69,6 @@ public class PlateDesignCodecTests
     [Fact]
     public void Decode_ReturnsNullOnPortraitPresetString()
     {
-        // An HTPS portrait preset must not decode as a design code.
         var portrait = PortraitPresetCodec.Encode(new PortraitSnapshot());
         Assert.Null(PlateDesignCodec.Decode(portrait));
     }

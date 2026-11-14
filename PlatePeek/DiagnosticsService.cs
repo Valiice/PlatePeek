@@ -60,10 +60,6 @@ public sealed class DiagnosticsService
         }
     }
 
-    /// <summary>Keeps only the newest <see cref="MaxRetainedDumps"/> timestamped dump files,
-    /// so DebugDumps doesn't grow the dumps directory unbounded over a play
-    /// session. latest.json is untouched. Filenames sort correctly by name since the
-    /// yyyyMMdd-HHmmss timestamp prefix is fixed-width and zero-padded.</summary>
     private static void PruneOldDumps(string dir)
     {
         var stale = Directory.GetFiles(dir, "*.json")
@@ -75,8 +71,6 @@ public sealed class DiagnosticsService
             File.Delete(file);
     }
 
-    /// <summary>Strips characters that are invalid in a filename (beyond the space-to-underscore
-    /// swap already applied), since player/FC names can contain arbitrary Unicode punctuation.</summary>
     private static string Sanitize(string name)
     {
         var invalid = Path.GetInvalidFileNameChars();
@@ -97,7 +91,6 @@ public sealed class DiagnosticsService
             Services.DataManager.GetExcelSheet<Lumina.Excel.Sheets.BannerTimeline>().Count > 0);
         Check("unlock check runs", () =>
         {
-            // Condition 0 must always be "unlocked"; a bogus id must not throw.
             using var u = new UnlockService();
             return u.GetUnlockState(0) == true && u.GetUnlockState(0xFFFF) != true;
         });

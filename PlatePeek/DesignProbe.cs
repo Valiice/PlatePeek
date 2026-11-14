@@ -6,13 +6,6 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace PlatePeek;
 
-/// <summary>
-/// Temporary diagnostic for discovering the Edit Plate Design addon's
-/// callback protocol. Toggled with "/platepeek probe". While enabled it logs
-/// every callback the plate windows fire into the game and every UI event
-/// they receive, so a manual click-through reveals which values select each
-/// design layer. Not part of the shipped feature set.
-/// </summary>
 public sealed unsafe class DesignProbe : IDisposable
 {
     private static readonly string[] Addons = ["CharaCardDesignSetting", "CharaCardEditMenu", "CharaCard"];
@@ -62,7 +55,6 @@ public sealed unsafe class DesignProbe : IDisposable
         }
         catch
         {
-            // Never let diagnostics break the UI path.
         }
 
         return fireCallbackHook!.Original(addon, valueCount, values, close);

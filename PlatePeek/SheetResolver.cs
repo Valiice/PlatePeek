@@ -16,12 +16,10 @@ public sealed class SheetResolver
     {
         var designItems = new List<ResolvedItem>();
 
-        // Base plate
         if (Services.DataManager.GetExcelSheet<CharaCardBase>().TryGetRow(s.BasePlate, out var basePlate))
             designItems.Add(MakeItem("Base Plate", s.BasePlate, basePlate.Name.ExtractText(),
                 basePlate.UnlockCondition.RowId, (uint)basePlate.Image));
 
-        // Top/bottom borders
         if (s.TopBorder != 0 && Services.DataManager.GetExcelSheet<CharaCardHeader>().TryGetRow(s.TopBorder, out var top))
             designItems.Add(MakeItem("Top Border", s.TopBorder, top.Name.ExtractText(),
                 top.UnlockCondition.RowId, (uint)top.TopImage));
@@ -29,7 +27,6 @@ public sealed class SheetResolver
             designItems.Add(MakeItem("Bottom Border", s.BottomBorder, bottom.Name.ExtractText(),
                 bottom.UnlockCondition.RowId, (uint)bottom.BottomImage));
 
-        // Typed decorations (backing, pattern overlay, portrait frame, plate frame, accent)
         var decoSheet = Services.DataManager.GetExcelSheet<CharaCardDecoration>();
         foreach (var decoId in s.Decorations)
         {
@@ -48,7 +45,6 @@ public sealed class SheetResolver
                 deco.UnlockCondition.RowId, (uint)deco.Image));
         }
 
-        // Portrait bg / frame / accent
         var portraitItems = new List<ResolvedItem>();
         if (Services.DataManager.GetExcelSheet<BannerBg>().TryGetRow(s.Portrait.BannerBg, out var bg))
             portraitItems.Add(MakeItem("Background", s.Portrait.BannerBg, bg.Name.ExtractText(),
@@ -60,7 +56,6 @@ public sealed class SheetResolver
             portraitItems.Add(MakeItem("Accent", s.Portrait.BannerDecoration, accent.Name.ExtractText(),
                 accent.UnlockCondition.RowId, (uint)accent.Icon));
 
-        // Pose (BannerTimeline): include unlock state; name may live on Action/Emote
         var poseName = "Unknown";
         var poseUnlocked = (bool?)null;
         if (Services.DataManager.GetExcelSheet<BannerTimeline>().TryGetRow(s.Portrait.BannerTimeline, out var timeline))
@@ -81,7 +76,6 @@ public sealed class SheetResolver
                 poseHint, (uint)timeline.Icon, poseUrl));
         }
 
-        // Gear
         var gearItems = new List<ResolvedItem>();
         var itemSheet = Services.DataManager.GetExcelSheet<Item>();
         var stainSheet = Services.DataManager.GetExcelSheet<Stain>();
@@ -109,7 +103,6 @@ public sealed class SheetResolver
             }
         }
 
-        // Profile names
         var playStyleNames = new List<string>();
         var playStyleSheet = Services.DataManager.GetExcelSheet<CharaCardPlayStyle>();
         foreach (var ps in s.PlayStyles)
@@ -120,7 +113,6 @@ public sealed class SheetResolver
 
         var worldName = Services.DataManager.GetExcelSheet<World>().TryGetRow(s.WorldId, out var world)
             ? world.Name.ExtractText() : "";
-        // ClassJob.Name is lowercase ("dark knight"); title-case it for display.
         var titleCase = System.Globalization.CultureInfo.InvariantCulture.TextInfo;
         var jobName = Services.DataManager.GetExcelSheet<ClassJob>().TryGetRow(s.ClassJobId, out var job)
             ? titleCase.ToTitleCase(job.Name.ExtractText()) : "";
@@ -136,7 +128,6 @@ public sealed class SheetResolver
         var gcName = s.GrandCompany != 0 && Services.DataManager.GetExcelSheet<GrandCompany>().TryGetRow(s.GrandCompany, out var gc)
             ? gc.Name.ExtractText() : "";
 
-        // BannerFacial row id = portrait expression index; the display name lives on its Emote.
         var expressionName = s.Portrait.Expression == 0 ? "None" : $"#{s.Portrait.Expression}";
         if (s.Portrait.Expression != 0
             && Services.DataManager.GetExcelSheet<BannerFacial>().TryGetRow(s.Portrait.Expression, out var facial)

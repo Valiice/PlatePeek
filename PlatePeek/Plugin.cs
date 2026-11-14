@@ -26,7 +26,6 @@ public sealed class Plugin : IDalamudPlugin
 
     private readonly ConfigWindow configWindow;
 
-    /// <summary>Set by DiagnosticsService (Task 8); invoked by "/platepeek selftest".</summary>
     public Action? SelfTestRequested { get; set; }
 
     public Plugin(IDalamudPluginInterface pluginInterface)
