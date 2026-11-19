@@ -2,6 +2,7 @@
 
 [![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Valiice/PlatePeek/total?style=flat-square&color=blue)](https://github.com/Valiice/PlatePeek/releases)
 [![GitHub Release](https://img.shields.io/github/v/release/Valiice/PlatePeek?include_prereleases&style=flat-square&color=green)](https://github.com/Valiice/PlatePeek/releases/latest)
+[![GitHub License](https://img.shields.io/github/license/Valiice/PlatePeek?style=flat-square&color=orange)](LICENSE.md)
 [![GitHub Issues](https://img.shields.io/github/issues/Valiice/PlatePeek?style=flat-square)](https://github.com/Valiice/PlatePeek/issues)
 [![Download Latest Zip](https://img.shields.io/badge/Download-Latest%20Zip-blue?style=flat-square)](https://github.com/Valiice/PlatePeek/releases/latest/download/PlatePeek.zip)
 
@@ -66,3 +67,9 @@ PlatePeek only reads data the game client already received to display the plate.
 
 - After a direct import, the editor's dropdown labels may show stale names until touched. The rendered portrait and saved values are correct.
 - Ownership marks show "?" until the unlock cache is first built (open any plate/portrait editor once).
+
+## License & Copyright
+
+Copyright © 2026 Valiice
+
+PlatePeek is licensed under the GNU Affero General Public License v3.0; see [LICENSE](LICENSE.md) for details. You are free to use, modify, and redistribute the source code, provided derivative works keep the same license, credit this project with a link back to [https://github.com/Valiice/PlatePeek](https://github.com/Valiice/PlatePeek), and retain this copyright notice.
